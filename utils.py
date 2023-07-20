@@ -20,18 +20,20 @@ def sythetic_data(n, d, noise_std=0.0):
             model.load_state_dict(torch.load(f'teacher_models/teacher_model_weight_input_dim={d}.pth'))
         else:
             for p in model.parameters():
-                teacher_param = torch.normal(0, 5, p.shape)
+                teacher_param = torch.normal(0, 10, p.shape)
                 p.data = teacher_param
             torch.save(model.state_dict(), f'teacher_models/teacher_model_weight_dim={d}.pth')
         noise = torch.normal(0, noise_std, size=(n, 1)) #第三引数はtuple
         X = torch.normal(0, 1, size=(n, d))
         fx = model(X)
         #fx = model(X) + noise #ノイズありの時はまた別の感じになる
-        fx = vmap(sigmoid)(X)
+        fx = vmap(sigmoid)(fx)
         # label = torch.where(fx >= 0.5, 1, 0) #teacher modelが最後にシグモイド層を持つとき
         # BCELossを使う時のラベルは[0,1]，HingeLossを使う時は[-1,1]
         # label = torch.where(fx >= 0, 1, -1)
+        
         label = torch.where(fx >= 0.5, 1, 0)
+        # print(label.size())
 
     return X, label.reshape(-1, 1)
 
@@ -52,7 +54,7 @@ def get_datas(num, dim, noise_std):
         data = Data()
         data.X, data.t = sythetic_data(num, dim, noise_std)
         path = f'sythetic_datas/num={num}_dim={dim}_noise_std={noise_std}'
-        pd.to_pickle(data, path)
+        # pd.to_pickle(data, path)
     
     return data
     
@@ -77,7 +79,7 @@ if __name__ == '__main__':
  
     # train_num = 2**8
     # test_num = 2**13
-    
+    """
     num = 10*d
     dim = 2
     noise_std = 0.1
@@ -89,3 +91,7 @@ if __name__ == '__main__':
     train_loader = make_dataloader(data, 3)
     for X, t in train_loader:
         print(X.shape, t)
+    """
+    X, t = sythetic_data(10, 5, 0.0)
+    print(X.size(), t.size())
+    

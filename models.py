@@ -7,7 +7,7 @@ class Teacher_model(nn.Module):
     def __init__(self, d):
         super ().__init__()
         self.d = d
-        self.m = 512
+        self.m = 128
         self.linear_relu = nn.Sequential(
             nn.Linear(d, self.m),
             nn.ReLU(),

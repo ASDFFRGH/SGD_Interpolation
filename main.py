@@ -26,8 +26,12 @@ def train(epoch):
         # print(f'outputs = {outputs}')
         # pred = torch.where(outputs >= 0, 1, -1)
         pred = torch.where(outputs >= 0.5, 1, 0)
-
-        loss = loss_func(outputs, target)
+        try:
+            loss = loss_func(outputs, target)
+        except RuntimeError as e:
+            print(model(inputs))
+            print(outputs)
+            print('catch error:', e)
         # print(loss)
         train_loss += loss.data
         correct += pred.eq(target).sum()
